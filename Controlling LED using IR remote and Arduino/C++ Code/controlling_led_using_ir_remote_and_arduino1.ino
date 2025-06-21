@@ -1,6 +1,6 @@
 // C++ code
-//Owner: Saleh Sadid Mir
-// CSE, KUET
+//Owner: Diganto
+// CE, KUET
 
 /*Title: Controlling LED using IR remote and Arduino*/
 
