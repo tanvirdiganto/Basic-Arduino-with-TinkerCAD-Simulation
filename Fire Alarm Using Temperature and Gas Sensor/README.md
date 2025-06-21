@@ -38,7 +38,7 @@ This Arduino-based project combines temperature and gas sensors to create a basi
 - Fire detection and prevention  
 - Industrial safety systems  
 - Smart home security solutions  
-- Air quality monitoring  
+- Air quality monitoring 
 
 ---
 
