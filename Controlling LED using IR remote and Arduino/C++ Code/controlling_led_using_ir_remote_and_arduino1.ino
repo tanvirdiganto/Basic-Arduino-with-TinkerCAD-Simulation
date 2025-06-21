@@ -1,6 +1,6 @@
 // C++ code
 //Owner: Diganto
-// CE, KUET
+//CE, KUET
 
 /*Title: Controlling LED using IR remote and Arduino*/
 
