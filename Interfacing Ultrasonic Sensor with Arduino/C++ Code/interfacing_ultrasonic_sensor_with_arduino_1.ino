@@ -1,6 +1,4 @@
-//Owner 
-//Tanvir hossain Diganto
-//CE , KUET 
+
 
 /*Title : Interfacing Ultrasonic Sensor with Arduino */
 
