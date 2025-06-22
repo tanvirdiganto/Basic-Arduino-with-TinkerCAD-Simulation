@@ -15,7 +15,7 @@ int echopin = 9;    // Pin connected to the Echo pin of the ultrasonic sensor
 
 // Variables to store time and distance
 long time;          // Duration of the pulse (in microseconds)
-int distance;       // Calculated distance (in centimeters)
+int distance;       // Calculate distance (in centimeters)
 
 void setup()
 {
