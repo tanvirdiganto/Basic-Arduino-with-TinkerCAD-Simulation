@@ -1,108 +1,107 @@
 // C++ code
-//Owner: Diganto
-//CE , KUET
+// Owner: Diganto
+// CE, KUET
+// Title: Password Protected Security System Using Arduino
 
-/*Title: Password Protected Security System Using Arduino */
+#include <Keypad.h>  // Include keypad library
 
-#include<Keypad.h> 
-// adding keypad library
+// Constants
+const byte ROWS = 4;
+const byte COLS = 4;
+const int RED = 12;       // Red LED pin
+const int GREEN = 11;     // Green LED pin
+const int PIEZO = 10;     // Buzzer pin
 
-const byte row=4;
-const byte col=4;
-const int RED =12;
-const int GREEN=11;
-const int PIEZO=10; //buzzer
-
-char numpad[row][col]={
-  						{'1','2','3'},{'4','5','6'},
-					   	{'7','8','9'},{'*','0','#'}
-					  };
-
-byte rowPin[row]= {9,8,7,6};
-byte colPin[col]= {5,4,3,2};
-
-String password="12345"; // the given password 
-String str=""; // a empty string
-
-Keypad key_pad = Keypad(makeKeymap(numpad), rowPin, colPin,row, col);
-//declaring the class keypad 
-
-//for unlocking tone
-const int frequency[] = {
-  340, 623, 523, 440, 623 // Simple "beep" pattern
+// Keypad layout
+char numpad[ROWS][COLS] = {
+  {'1', '2', '3', 'A'},
+  {'4', '5', '6', 'B'},
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
 };
 
-// Define the duration of each tone (in milliseconds)
-const int delay_time[] = {
-  200, 200, 200, 250,150 // 100ms for each note
-};
+// Keypad row and column pins
+byte rowPins[ROWS] = {9, 8, 7, 6};
+byte colPins[COLS] = {5, 4, 3, 2};
 
-void setup()
-{
+// Password setup
+String password = "12345";
+String inputStr = "";  // Store user input
+
+// Initialize keypad object
+Keypad keyPad = Keypad(makeKeymap(numpad), rowPins, colPins, ROWS, COLS);
+
+// Unlock tone frequencies (Hz)
+const int frequency[] = {340, 623, 523, 440, 623};
+// Tone duration (ms)
+const int delayTime[] = {200, 200, 200, 250, 150};
+
+void setup() {
   pinMode(RED, OUTPUT);
   pinMode(GREEN, OUTPUT);
   pinMode(PIEZO, OUTPUT);
-  digitalWrite(RED, HIGH);
+  
+  digitalWrite(RED, HIGH);      // RED LED ON initially
+  digitalWrite(GREEN, LOW);     // GREEN LED OFF initially
+  
   Serial.begin(9600);
   Serial.print("Enter Password: ");
-  
 }
 
-void loop()
-{
-  char key= key_pad.getKey(); //inputs the key from keypad 
-  if(key){
+void loop() {
+  char key = keyPad.getKey();
+
+  if (key) {
+    // Beep for key press
     tone(PIEZO, 300);
     delay(50);
     noTone(PIEZO);
-  }
-  if(key){
-    if(str.length()<5){  // do it for 5 times 
-      
-      Serial.print("*");
-      str += key; //the pressed key is added with str string
+
+    // Only accept up to 5 digits
+    if (inputStr.length() < 5) {
+      Serial.print("*");        // Mask input with *
+      inputStr += key;          // Append key to input string
     }
   }
-  if(str.length()==5){ // if 5 key is pressed then check once
-    delay(1000);
-    if(password== str){ //if given pin and user input matches
+
+  // Check password when 5 keys entered
+  if (inputStr.length() == 5) {
+    delay(1000);                // Small delay before checking
+    if (inputStr == password) {
+      // Correct password
       Serial.println("\nEnter");
       digitalWrite(RED, LOW);
       digitalWrite(GREEN, HIGH);
-      unlktone();
-      
-     }
-     else{
+      unlockTone();
+    } else {
+      // Incorrect password
       Serial.println("\n\tWrong Password\n\tPlease Try Again!!");
       digitalWrite(RED, HIGH);
       digitalWrite(GREEN, LOW);
-       
-       
+
+      // Error tone
       tone(PIEZO, 1000);
       delay(500);
       tone(PIEZO, 1000);
       delay(500);
       noTone(PIEZO);
-       
-       
-     }
-     delay(1000);
-	 str="";
-     Serial.println("---------------------------\nEnter Password: ");
-     digitalWrite(RED, HIGH);
-     digitalWrite(GREEN, LOW);
-   }          
-}
-
-void unlktone(){
-  for (int i = 0; i < 5; i++) {
-      // Play the tone at the specified frequency
-      tone(PIEZO, frequency[i]);
-      // Wait for the note to finish (duration in milliseconds)
-      delay(delay_time[i]);
-      // Stop the tone after the note duration
-      noTone(PIEZO);
-
-      delay(20); 
     }
+
+    // Reset for next input
+    delay(1000);
+    inputStr = "";
+    Serial.println("---------------------------\nEnter Password: ");
+    digitalWrite(RED, HIGH);
+    digitalWrite(GREEN, LOW);
+  }
 }
+
+void unlockTone() {
+  for (int i = 0; i < 5; i++) {
+    tone(PIEZO, frequency[i]);
+    delay(delayTime[i]);
+    noTone(PIEZO);
+    delay(20);                  // Short pause between notes
+  }
+}
+
