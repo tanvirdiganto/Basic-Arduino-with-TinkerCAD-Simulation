@@ -1,7 +1,7 @@
 // C++ code
 // Title: Automatic Smart Hand Sanitizer
-// Author: [Your Name or Diganto]
-// Department: CSE, KUET
+// Author:  Diganto]
+// Department: CE, KUET
 
 #include <Servo.h>
 
