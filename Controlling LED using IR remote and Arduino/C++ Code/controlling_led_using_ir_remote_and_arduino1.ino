@@ -1,64 +1,37 @@
 // C++ code
-//Owner: Diganto
-//CE, KUET
+// Owner: Diganto
+// CSE, KUET
+// Title: Light Intensity Measurement Using LDR Sensor
 
-/*Title: Controlling LED using IR remote and Arduino*/
+// Variable to store the analog reading from the LDR
+int sensorValue = 0;
 
-#include<IRremote.h>
-int IR_recieve= 12;
-int blue=9;
-int orange=10;
-int green = 11;
+void setup() {
+  // Set A0 as input (LDR sensor connected here)
+  pinMode(A0, INPUT);
 
+  // Set pin 9 as output (for controlling LED brightness or similar)
+  pinMode(9, OUTPUT);
 
-           
-void setup()
-{
+  // Initialize serial communication at 9600 bps
   Serial.begin(9600);
-   // starts the reciever
-  IrReceiver.begin(IR_recieve);
-  pinMode(blue, OUTPUT);
-  pinMode(orange, OUTPUT);
-  pinMode(green, OUTPUT);
-  
-  
 }
 
-void loop()
-{
-  if(IrReceiver.decode()){
-  	long int decCode = IrReceiver.decodedIRData.decodedRawData;
-    Serial.println(decCode);
-   
-    switch(decCode){
-      case -284115200: // when button 1 of IR remote is pressed
-        digitalWrite(blue, HIGH);
-        break;
-      case -300826880: // when button 2 of IR remote is pressed
-        digitalWrite(blue, LOW);
-        break;
-      case -317538560: // when button 3 of IR remote is pressed
-        digitalWrite(orange, HIGH);
-        break;
-      case -350961920: // when button 4 of IR remote is pressed
-        digitalWrite(orange, LOW);
-        break;
-      case -367673600: // when button 5 of IR remote is pressed
-        digitalWrite(green, HIGH);
-        break;
-      case -384385280: // when button 6 of IR remote is pressed
-        digitalWrite(green, LOW);
-        break;
-     
-      
-      default:
-        break;
-    }
-    
-      
-    
-    IrReceiver.resume(); //continues recieving the next value
-      
-  }
-  delay(10);
+void loop() {
+  // Read analog value from LDR (0 to 1023)
+  sensorValue = analogRead(A0);
+
+  // Print the sensor reading to the Serial Monitor
+  Serial.println(sensorValue);
+
+  // Map the sensor value (0-1023) to PWM value (0-255)
+  // This controls brightness of an LED or motor speed etc.
+  int pwmValue = map(sensorValue, 0, 1023, 0, 255);
+
+  // Output the mapped PWM value to pin 9
+  analogWrite(9, pwmValue);
+
+  // Short delay before next reading (100 ms)
+  delay(100);
 }
+
