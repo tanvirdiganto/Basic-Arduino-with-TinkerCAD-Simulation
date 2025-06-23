@@ -1,129 +1,136 @@
-// C++ code
-// owner: Diganto
-// CE , KUET
 
-/*Title: Arduino Calculator using 4*4 keypad and LCD display*/
-
+// Include necessary libraries
 #include <Keypad.h>
-#include <LiquidCrystal.h> //library for lcd display
+#include <Wire.h>
+#include <LiquidCrystal.h>
 
-LiquidCrystal  lcd(13,12,11,10,9,8); // creating a object of lcd class
+// Initialize the LCD screen with the Arduino pins it's connected to
+// Format: LiquidCrystal(RS, E, D4, D5, D6, D7)
+LiquidCrystal lcd(13, 12, 11, 10, 9, 8);
 
-// declaring variables for calculations
-long first =0;
-long second =0;
-double total = 0; 
+// Variables to hold the numbers and the result
+long first = 0;
+long second = 0;
+double total = 0;
+char customKey;
 
+// Define the keypad layout (rows and columns)
+const byte ROWS = 4;
+const byte COLS = 4;
 
-char pressedKey; //for storing the pressed key in a variable 
-const byte ROWS=4; //keypad row and column
-const byte COLS=4;
-
-//keypad mapping
-char keys[ROWS][COLS]={
-  {'1','2','3','+'},
-  {'4','5','6','-'},
-  {'7','8','9','*'},
-  {'C','0','=','/'}
+// Define the keymap which corresponds to the keypad layout
+// 'C' is for Clear, '#' is for Equals
+char keys[ROWS][COLS] = {
+  {'1', '2', '3', '+'},
+  {'4', '5', '6', '-'},
+  {'7', '8', '9', '*'},
+  {'C', '0', '#', '/'}
 };
 
-//pins connected with arduino 
-byte rowPins[ROWS]={7,6,5,4};
-byte colPins[COLS]={3,2,1,0};
+// Define the Arduino pins connected to the keypad rows and columns
+byte rowPins[ROWS] = {7, 6, 5, 4};
+byte colPins[COLS] = {3, 2, 1, 0};
 
-//obj of keypad class
-//converts the keys into a usable format
-Keypad customKeypad = Keypad(makeKeymap(keys),rowPins, colPins, ROWS, COLS);
+// Create a Keypad object
+Keypad customKeypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
-
-void setup()
-{
-  lcd.begin(16,2); // Initializes the LCD (16 columns, 2 rows).
-  
-  lcd.setCursor(0,0);
-  lcd.print("Calculator"); //Displays "Calculator" on the first row.
-  
-  lcd.setCursor(0,1);
-  lcd.print("Enter numbers");// Displays "Enter numbers" on the second row.
-  delay(4000);
-  
-  lcd.clear(); // Clears the screen
-  lcd.setCursor(0,0); 
-}
-
-void loop()
-{
-  pressedKey= customKeypad.getKey(); //Get the pressed Key
-  
-  switch(pressedKey){ 
-    
-    case '0' ... '9':
-      lcd.setCursor(0,0);
-      first= first * 10 + (pressedKey -'0'); //Converts multiple key presses into a multi-digit number.
-									         //here '0' is subtracted to get the integer value of the character by subtracting it from 0's ASCII value
-      lcd.print(first);
-      break;
-    
-    case '+':
-      first=(total != 0 ?total : first); //Useing previous total if it exists
-      lcd.print("+");
-      second= secondNumber() ; //calling function to get the value of 2nd num
-      total= first + second; // addition operation
-      lcd.setCursor(0,3);
-	  lcd.print(total);
-      first=0, second=0;
-      break;
-    
-    case '-':
-      first=(total !=0 ? total : first);
-      lcd.print("-");
-      second= secondNumber() ;
-      total= first - second; //subtraction
-      lcd.setCursor(0,3);
-	  lcd.print(total);
-      first=0, second=0;
-      break;
-    
-    case '*':
-      first=(total != 0 ? total : first);
-      lcd.print("*");
-      second= secondNumber() ;
-      total= first * second;//multiplication
-      lcd.setCursor(0,3);
-	  lcd.print(total);
-      first=0, second=0;
-      break;
-    
-    case '/':
-      first= (total != 0 ? total : first);
-      lcd.print("/");
-      second= secondNumber() ;
-      lcd.setCursor(0,3);
-    
-      second == 0 ? lcd.print("Invalid") : total= (float)first/second;
-	  //check if it is divisible . If 2nd num is 0 then not divisible  
-      lcd.print(total);
-      first=0, second=0;
-      break;
-    
-    case 'C': //clears the data and screen
-      total = 0;
-      lcd.clear();
-      break;
-  }          
-}
-
-long secondNumber(){
-  while(1){
-  	pressedKey= customKeypad.getKey(); //storing the 2nd pressed key 
-    
-    if(pressedKey>= '0' &&pressedKey<='9'){
-      
-    	second = second *10 + (pressedKey -'0');
-        lcd.setCursor(7,0);  
-        lcd.print(second);
+// Function to get the second number from the keypad
+long getSecondNumber() {
+  long num = 0;
+  while (1) {
+    customKey = customKeypad.getKey();
+    if (customKey) { // Proceed if a key is pressed
+      if (customKey >= '0' && customKey <= '9') {
+        num = num * 10 + (customKey - '0');
+        lcd.print(customKey); // Display the digit pressed
+      }
+      if (customKey == '#') { // If '#' (equals) is pressed, exit the loop
+        break;
+      }
     }
-    if(pressedKey =='=') break; // breaks only when '=' is pressed
   }
-  return second;
+  return num;
+}
+
+void setup() {
+  // Initialize the LCD
+  lcd.begin(16, 2);
+  lcd.setCursor(0, 0);
+  lcd.print("Calculator");
+  lcd.setCursor(0, 1);
+  lcd.print("Enter numbers");
+  delay(2000); // Display welcome message for 2 seconds
+  lcd.clear();
+  lcd.setCursor(0, 0);
+}
+
+void loop() {
+  customKey = customKeypad.getKey();
+
+  if (customKey) { // Proceed only if a key is pressed
+    switch (customKey) {
+      // Handle numeric keys (0-9) for the first number
+      case '0' ... '9':
+        first = first * 10 + (customKey - '0');
+        lcd.setCursor(0, 0);
+        lcd.print(first);
+        break;
+
+      // Handle the addition operation
+      case '+':
+        lcd.print('+');
+        second = getSecondNumber();
+        total = first + second;
+        lcd.setCursor(0, 1); // Move cursor to the second line for the result
+        lcd.print(total);
+        first = 0;
+        second = 0;
+        break;
+
+      // Handle the subtraction operation
+      case '-':
+        lcd.print('-');
+        second = getSecondNumber();
+        total = first - second;
+        lcd.setCursor(0, 1);
+        lcd.print(total);
+        first = 0;
+        second = 0;
+        break;
+
+      // Handle the multiplication operation
+      case '*':
+        lcd.print('*');
+        second = getSecondNumber();
+        total = first * second;
+        lcd.setCursor(0, 1);
+        lcd.print(total);
+        first = 0;
+        second = 0;
+        break;
+
+      // Handle the division operation
+      case '/':
+        lcd.print('/');
+        second = getSecondNumber();
+        lcd.setCursor(0, 1);
+        if (second == 0) {
+          lcd.print("Invalid Div"); // Handle division by zero
+        } else {
+          total = (float)first / (float)second; // Use float for decimal results
+          lcd.print(total);
+        }
+        first = 0;
+        second = 0;
+        break;
+
+      // Handle the Clear function
+      case 'C':
+        first = 0;
+        second = 0;
+        total = 0;
+        lcd.clear();
+        break;
+    }
+  }
 }
