@@ -1,45 +1,47 @@
 // C++ code
-// owner: Diganto
-// CE , KUET
-
-/*Title: 4*4 Keypad Interfacing with Arduino Uno */
+// Owner: Diganto
+// CE, KUET
+// Title: 4x4 Keypad Interface with Arduino Uno
 
 #include <Keypad.h>
 
-const byte ROWS=4; //keypad no of row and column
-const byte COLS=4;
+// --- Keypad configuration ---
+const byte NUM_ROWS = 4;
+const byte NUM_COLS = 4;
 
-//keypad mapping
-char keys[ROWS][COLS]={
-  {'1','2','3','A'},
-  {'4','5','6','B'},
-  {'7','8','9','C'},
-  {'*','0','#','D'}
+// Key layout on the keypad
+char keypadLayout[NUM_ROWS][NUM_COLS] = {
+  {'1', '2', '3', 'A'},
+  {'4', '5', '6', 'B'},
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
 };
 
-//pins connected with arduino 
-byte rowPins[ROWS]={9,8,7,6};
-byte colPins[COLS]={5,4,3,2};
+// Arduino pin connections
+byte rowPins[NUM_ROWS] = {9, 8, 7, 6};
+byte colPins[NUM_COLS] = {5, 4, 3, 2};
 
-//obj of keypad class
-//converts the keys into a usable format
-Keypad kypd = Keypad(makeKeymap(keys),rowPins, colPins, ROWS, COLS);
+// Create Keypad object
+Keypad myKeypad = Keypad(makeKeymap(keypadLayout), rowPins, colPins, NUM_ROWS, NUM_COLS);
 
-
-void setup()
-{
-  Serial.begin(9600); 
+void setup() {
+  // Initialize serial monitor
+  Serial.begin(9600);
+  Serial.println("System Initialized: Waiting for key press...");
 }
 
-void loop()
-{
-  char pressedKey; //for storing the pressed key in a variable 
+void loop() {
+  // Fetch key press
+  char pressedKey = myKeypad.getKey();
 
-  pressedKey= kypd.getKey(); //Get the pressed Key
-  //print the key if preesed
-  if(pressedKey){
-    Serial.print("Key pressed: ");
-    Serial.println(pressedKey);
- 
-  }          
+  if (pressedKey != NO_KEY) {
+    // Display the pressed key
+    displayKey(pressedKey);
+  }
+}
+
+// Function to print key to Serial Monitor
+void displayKey(char key) {
+  Serial.print("Detected Key: ");
+  Serial.println(key);
 }
