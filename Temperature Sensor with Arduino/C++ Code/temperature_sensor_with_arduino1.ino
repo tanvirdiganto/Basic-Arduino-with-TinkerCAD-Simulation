@@ -1,51 +1,62 @@
 // C++ code
-//Owner : Diganto
-//CE, KUET
+// Owner: Diganto
+// CE, KUET
+// Title: Temperature Sensor with Arduino
 
-/*Title:Temperature Sensor with Arduino*/
+// Analog pin where temperature sensor is connected
+const int TMP_PIN = A0;
 
-int tmp=A0;
+// Variables to store readings
+float analogReading;
+float voltage;
+float tempCelsius;
+float tempFahrenheit;
 
-float volt;
-float analog_reading;
-float temp_fahrenheit;
-float temp_celcius;         
+void setup() {
+  // Set TMP_PIN as input (optional, as analogRead handles this)
+  pinMode(TMP_PIN, INPUT);
 
-void setup()
-{
-  pinMode(A0, INPUT); 
+  // Initialize serial communication for output
   Serial.begin(9600);
-  
 }
 
-void loop()
-{
-  analog_reading= analogRead(A0);
-  Serial.print("\n\nAnalog readindg: "); //printing the analog input from a0 pin
-  Serial.println(analog_reading);
-  
-  
-  //conversion of analog reading to voltage 
-  volt= analog_reading*5/1024; 
-  // here , the analog reading range is from 0 to 1024 
-  // so we divided the reading by 1024 and multiplied by 5 so that the equivalent volt is gained ranging from 0 to 5 vol
-  
-  Serial.print("Voltage readindg: "); //printing the calculated voltage
-  Serial.println(volt);
-  
-  
-  //reading in celcius 
-  //10mv change in sensor per degree celcius change with 0.5V offset  
-  temp_celcius= 100*(volt-0.5);
-  
-  Serial.print("Celcius readindg: "+String(temp_celcius)+ ("C")); //printing the calculated celcius temp
-  
-  //reading in fahrenheit
-  //using C to F formula
-  temp_fahrenheit= (temp_celcius*9/5)+32;
-  
-  Serial.print("\nFahrenheit readindg: "+String(temp_fahrenheit)+ ("F")); //printing the calculated celcius temp
+void loop() {
+  // Read analog value from temperature sensor (0 - 1023)
+  analogReading = analogRead(TMP_PIN);
+
+  // Print raw analog value for reference
+  Serial.print("\n\nAnalog reading: ");
+  Serial.println(analogReading);
+
+  // Convert analog value to voltage
+  // Formula: voltage = (analogReading * 5V) / 1024
+  // Arduino ADC gives 0-5V as 0-1023 values
+  voltage = (analogReading * 5.0) / 1024.0;
+
+  // Print calculated voltage
+  Serial.print("Voltage reading: ");
+  Serial.println(voltage);
+
+  // Convert voltage to temperature in Celsius
+  // Assuming LM35/ similar: 10mV per °C with 0.5V offset
+  // Formula: (Vout - 0.5) * 100
+  tempCelsius = 100.0 * (voltage - 0.5);
+
+  // Print temperature in Celsius
+  Serial.print("Celsius reading: ");
+  Serial.print(tempCelsius);
+  Serial.println(" C");
+
+  // Convert Celsius to Fahrenheit
+  // Formula: °F = (°C × 9/5) + 32
+  tempFahrenheit = (tempCelsius * 9.0 / 5.0) + 32.0;
+
+  // Print temperature in Fahrenheit
+  Serial.print("Fahrenheit reading: ");
+  Serial.print(tempFahrenheit);
+  Serial.println(" F");
+
+  // Wait for 3 seconds before next reading
   delay(3000);
-  
-  
 }
+
