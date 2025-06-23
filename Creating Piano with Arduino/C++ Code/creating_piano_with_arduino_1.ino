@@ -1,6 +1,6 @@
 // C++ code
 // Author: Diganto
-// CSE, KUET
+// CE, KUET
 // Title: Arduino Piano Using Push Buttons and Piezo Buzzer
 
 // --- Pin and tone configuration ---
